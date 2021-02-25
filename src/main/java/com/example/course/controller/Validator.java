@@ -6,7 +6,7 @@ public class Validator {
 
     static Boolean isName(String name)
     {
-        Boolean val=name!=null;
+        Boolean val = name!=null;
 
         for(int letter=0 ; letter<name.length() && val ; letter++)
             if(!( name.charAt(letter) == ' ' || Character.isAlphabetic(name.charAt(letter)) ))
@@ -32,14 +32,14 @@ public class Validator {
 
     static  Boolean isNumber(String number)
     {
-        Boolean val=true;
+        Boolean val = true;
 
         if(number.length()!=10||number.charAt(0)<'6'||number.charAt(1)<'1')
-            val=false;
+            val = false;
 
         for(int num=2; num<number.length() && val; num++)
             if(number.charAt(num)<'0' && number.charAt(num)>'9')
-                val=false;
+                val = false;
 
             return val;
     }

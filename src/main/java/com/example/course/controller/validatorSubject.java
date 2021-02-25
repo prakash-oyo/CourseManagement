@@ -1,7 +1,7 @@
 package com.example.course.controller;
 
 
-public class Validator_Subject {
+public class validatorSubject {
     static Boolean isSubject(String subject)
     {
         Boolean val=subject!=null;

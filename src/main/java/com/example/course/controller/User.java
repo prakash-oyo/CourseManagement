@@ -13,16 +13,16 @@ import javax.persistence.Table;
 @Table(name="user_entity")
 public class User {
     @NonNull
-    @Column(name="name")
+    @Column(name = "name")
     String name;
     @NonNull
     @Id
     String email;
     @NonNull
-    @Column(name="number")
+    @Column(name = "number")
     String number;
     @NonNull
-    @Column(name="role")
+    @Column(name = "role")
     String role;
 
 
@@ -38,27 +38,27 @@ public class User {
         Boolean isName = Validator.isName(name);
 
         if(isName)
-            this.name=name;
+            this.name = name;
         else this.name = "invalid";
 
-        Boolean isEmail=Validator.isEmail(email);
+        Boolean isEmail = Validator.isEmail(email);
 
         if(isEmail)
-            this.email=email;
-        else this.email="invalid";
+            this.email = email;
+        else this.email = "invalid";
 
         Boolean isNumber=Validator.isNumber(number);
 
         if(isNumber)
-            this.number=number;
-        else this.number="invalid";
+            this.number = number;
+        else this.number = "invalid";
 
 
         role=role.toUpperCase();
 
-        if((role.compareTo("STUDENT")==0||role.compareTo("ADMIN")==0))
-            this.role=role;
-        else this.role="invalid";
+        if((role.compareTo("STUDENT")==0 || role.compareTo("ADMIN")==0))
+            this.role = role;
+        else this.role = "invalid";
 
         System.out.println("There");
         System.out.println(this.email);

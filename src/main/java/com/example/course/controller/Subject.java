@@ -15,11 +15,11 @@ import javax.persistence.Table;
 public class Subject {
     @Id
     @NonNull
-    @Column(name="subjectCode")
+    @Column(name="subject_Code")
     String subjectCode;
 
     @NonNull
-    @Column(name="subjectName")
+    @Column(name="subject_Name")
     String subjectName;
 
     @NonNull
@@ -30,7 +30,7 @@ public class Subject {
 
     public Subject(@NonNull String subjectName, int credit) {
 
-        Boolean isSubject = Validator_Subject.isSubject(subjectName);
+        Boolean isSubject = validatorSubject.isSubject(subjectName);
 
         if(isSubject)
             this.subjectName = subjectName;
@@ -39,7 +39,7 @@ public class Subject {
             this.credit = credit;
         else this.credit = -1;
 
-        this.subjectCode=Validator_Subject.returnSubCode(subjectName);
+        this.subjectCode= validatorSubject.returnSubCode(subjectName);
 
 
 

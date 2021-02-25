@@ -7,14 +7,14 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "UserCourseProgram")
+@Table(name = "User_Course_Program")
 public class UserCourseProgram {
     @Id
     @NonNull
-    @Column(name="email")
+    @Column(name = "email")
     String email;
     @NonNull
-    @Column(name="courseName")
+    @Column(name = "course_Name")
     String courseName;
 
 
@@ -23,20 +23,20 @@ public class UserCourseProgram {
 
     public UserCourseProgram(@NonNull String email, @NonNull String courseName) {
 
-        Boolean isEmail=Validator.isEmail(email);
+        Boolean isEmail = Validator.isEmail(email);
 
         if(isEmail)
             this.email = email;
-        else this.email="invalid";
+        else this.email = "invalid";
 
-        Boolean isCourseName=Validator_Subject.isCourseName(courseName);
+        Boolean isCourseName = validatorSubject.isCourseName(courseName);
 
         if(isCourseName)
-            this.courseName=courseName;
-        else this.courseName="invalid";
+            this.courseName = courseName;
+        else this.courseName = "invalid";
 
 
-        this.addedSubject=null;
+        this.addedSubject = null;
 
     }
 

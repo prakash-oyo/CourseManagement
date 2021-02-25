@@ -29,22 +29,24 @@ public class RestEndpoints {
 
 
     @GetMapping("/user/{id}")
-    public ResponseEntity <ApiResponse> search(@PathVariable String id) {
-        Optional<User> found = userRepository.findById(id);
+    public ResponseEntity <ApiResponse> searchUser(@PathVariable String id) {
 
-        if(!found.isPresent())
+        Optional<User> idFound = userRepository.findById(id);
+
+        if(!idFound.isPresent())
         {
-            ApiResponse ret=new ApiResponse(found,Boolean.FALSE,"No Such User");
+            ApiResponse ret=new ApiResponse(idFound,Boolean.FALSE,"No Such User");
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ret);
         }
 
-            return ResponseEntity.ok(new ApiResponse(found.get(),Boolean.TRUE,"DONE"));
+            return ResponseEntity.ok(new ApiResponse(idFound.get(),Boolean.TRUE,"DONE"));
 
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/new/user")
     public ResponseEntity<ApiResponse> registerUser(@RequestBody User noob) {
+
         User toParse = new User(noob.getName(), noob.getEmail(), noob.getNumber(), noob.getRole());
 
         if (toParse.getName().compareTo("invalid") == 0 ||
@@ -59,9 +61,9 @@ public class RestEndpoints {
                     "Invalid Email",Boolean.FALSE,"TRY AGAIN"
             ));
 
-        Optional<User> found = userRepository.findById(toParse.getEmail());
+        Optional<User> foundUser = userRepository.findById(toParse.getEmail());
 
-        if(found.isPresent())
+        if(foundUser.isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(
                     "User Already Exists",Boolean.FALSE,"Try Different Email"));
 
@@ -76,11 +78,11 @@ public class RestEndpoints {
 
         String id = (String) userMap.get("id");
 
-        Optional<User> returned;
-        returned = userRepository.findById(id);
+        Optional<User> idFound;
+        idFound = userRepository.findById(id);
 
 
-        if (!returned.isPresent()) {
+        if (!idFound.isPresent()) {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                     Boolean.FALSE,"No Such USER"
@@ -88,9 +90,9 @@ public class RestEndpoints {
             );
         }
 
-        String tem = returned.get().getRole();
 
-        if (tem.compareTo("ADMIN") != 0)
+
+        if (idFound.get().getRole().compareTo("ADMIN") != 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Authorization Error"
                     )
@@ -98,25 +100,26 @@ public class RestEndpoints {
 
 
         ObjectMapper mapper = new ObjectMapper();
-        Subject temp = mapper.convertValue(userMap, Subject.class);
+
+        Subject tempSubject = mapper.convertValue(userMap, Subject.class);
 
 
-        Subject toAdd = new Subject(temp.getSubjectName(), temp.getCredit());
+        Subject toAddSubject = new Subject(tempSubject.getSubjectName(), tempSubject.getCredit());
 
-        if (toAdd.getSubjectName().compareTo("invalid") == 0 ||
-                toAdd.getCredit() == -1)
+        if (toAddSubject.getSubjectName().compareTo("invalid") == 0 ||
+                toAddSubject.getCredit() == -1)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Invalid Subject Details"
                     )
             );
 
-        if(subjectRepository.findById(toAdd.getSubjectCode()).isPresent())
+        if(subjectRepository.findById(toAddSubject.getSubjectCode()).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Subject Already Added"
                     )
             );
 
-        subjectRepository.save(toAdd);
+        subjectRepository.save(toAddSubject);
 
         return ResponseEntity.status(HttpStatus.OK).body(new StatusResponse(
                         Boolean.TRUE,"Subject Added"
@@ -132,40 +135,40 @@ public class RestEndpoints {
     {
 
         String id=(String) userMap.get("id");
-        Optional<User> returned;
+        Optional<User> idFound;
 
-        returned = userRepository.findById(id);
-        if (!returned.isPresent())
+        idFound = userRepository.findById(id);
+        if (!idFound.isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"No Such USER"
                     )
             );
 
 
-        if(returned.get().getRole().compareTo("ADMIN")!=0)
+        if(idFound.get().getRole().compareTo("ADMIN")!=0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Unauthorized Access"
             ));
 
-        CourseProgram toAdd=new CourseProgram((String) userMap.get("CourseName"),
+        CourseProgram toAddCourse=new CourseProgram((String) userMap.get("CourseName"),
                 (int) userMap.get("maxCredit"));
 
-        if(toAdd.getCourseName().compareTo("invalid")==0||
-                toAdd.maxCredit==-1)
+        if(toAddCourse.getCourseName().compareTo("invalid")==0||
+                toAddCourse.maxCredit==-1)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Invalid Course Details Entered"
                     )
             );
 
 
-        if(courseRepository.findById(toAdd.getCourseCode()).isPresent())
+        if(courseRepository.findById(toAddCourse.getCourseCode()).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Course Already Exist"
                     )
             );
 
 
-        courseRepository.save(toAdd);
+        courseRepository.save(toAddCourse);
 
         return ResponseEntity.status(HttpStatus.OK).body(new StatusResponse(
                         Boolean.TRUE,"Course Successfully Created"
@@ -180,22 +183,22 @@ public class RestEndpoints {
 
         String id= (String) userMap.get("id");
 
-        Optional<User> returned;
-        returned = userRepository.findById(id);
-        if (!returned.isPresent())
+        Optional<User> idFound;
+        idFound = userRepository.findById(id);
+        if (!idFound.isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"No Such USER"
                     )
             );
 
-        if(returned.get().getRole().compareTo("ADMIN")!=0)
+        if(idFound.get().getRole().compareTo("ADMIN")!=0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Unauthorized Access"
                     )
             );
 
         String subject=(String) userMap.get("subjectName");
-        String subjectCode=Validator_Subject.returnSubCode(subject);
+        String subjectCode= validatorSubject.returnSubCode(subject);
         Optional<Subject> subjectSelected;
         subjectSelected = subjectRepository.findById(subjectCode);
 
@@ -206,7 +209,7 @@ public class RestEndpoints {
             );
 
 
-        String courseCode = Validator_Subject.returnSubCode((String) userMap.get("courseName"));
+        String courseCode = validatorSubject.returnSubCode((String) userMap.get("courseName"));
 
         if (!courseRepository.findById(courseCode).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
@@ -242,17 +245,17 @@ public class RestEndpoints {
 
         String id=(String) userMap.get("id");
 
-        Optional<User> returned;
-        returned=userRepository.findById(id);
+        Optional<User> idFound;
+        idFound=userRepository.findById(id);
 
 
-        if(!returned.isPresent()||returned.get().getRole().compareTo("STUDENT") != 0)
+        if(!idFound.isPresent() || idFound.get().getRole().compareTo("STUDENT") != 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Invalid Id Or Authorization Error"
                     )
             );
 
-        String courseCode=Validator_Subject.returnSubCode((String) userMap.get("courseName"));
+        String courseCode= validatorSubject.returnSubCode((String) userMap.get("courseName"));
 
         if(!courseRepository.findById(courseCode).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
@@ -280,18 +283,18 @@ public class RestEndpoints {
 
         String id=(String) userMap.get("id");
 
-        Optional<User> returned;
-        returned=userRepository.findById(id);
+        Optional<User> idFound;
+        idFound = userRepository.findById(id);
 
 
 
-        if(!returned.isPresent()||returned.get().getRole().compareTo("STUDENT") != 0)
+        if(!idFound.isPresent() || idFound.get().getRole().compareTo("STUDENT") != 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                         Boolean.FALSE,"Invalid Id Or Authorization Error"
                 )
         );
 
-        String subjectCode=Validator_Subject.returnSubCode((String) userMap.get("subjectName"));
+        String subjectCode= validatorSubject.returnSubCode((String) userMap.get("subjectName"));
 
         if(!subjectRepository.findById(subjectCode).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
@@ -300,7 +303,7 @@ public class RestEndpoints {
             );
 
 
-        int credit=subjectRepository.findById(subjectCode).get().getCredit();
+        int credit = subjectRepository.findById(subjectCode).get().getCredit();
 
         Optional<UserCourseProgram> courseSelected;
         courseSelected = userCourseRepository.findById(id);
@@ -312,7 +315,7 @@ public class RestEndpoints {
             );
 
 
-        String courseCode=Validator_Subject.returnSubCode(courseSelected.get().getCourseName());
+        String courseCode= validatorSubject.returnSubCode(courseSelected.get().getCourseName());
         Optional<CourseProgram> course;
         course = courseRepository.findById(courseCode);
         CourseProgram currentCourse=course.get();
@@ -373,16 +376,16 @@ public class RestEndpoints {
     {
         String studentId=(String) userMap.get("studentId");
 
-        Optional<User> returned;
-        returned = userRepository.findById(studentId);
+        Optional<User> idFound;
+        idFound = userRepository.findById(studentId);
 
-        if(!returned.isPresent())
+        if(!idFound.isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Student Does Not Exist"
                     )
             );
 
-        if(returned.get().getRole().compareTo("STUDENT") != 0)
+        if(idFound.get().getRole().compareTo("STUDENT") != 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Admin Can't Be Deleted"
                     )
@@ -390,15 +393,16 @@ public class RestEndpoints {
 
         String adminId=(String) userMap.get("adminId");
 
-        returned=userRepository.findById(adminId);
+        idFound = userRepository.findById(adminId);
 
-        if(!returned.isPresent())
+
+        if(!idFound.isPresent())
            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                     Boolean.FALSE,"Admin Does Not Exist"
             )
     );
 
-        if(returned.get().getRole().compareTo("ADMIN")!=0)
+        if(idFound.get().getRole().compareTo("ADMIN") != 0)
           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                     Boolean.FALSE,"Unauthorized Access"
             )
@@ -419,34 +423,50 @@ public class RestEndpoints {
     }
 
     @DeleteMapping("del/course")
-    public String deleteCourse(@RequestBody Map<String, Object> userMap) {
+    public ResponseEntity<StatusResponse> deleteCourse(@RequestBody Map<String, Object> userMap) {
+
         String adminId = (String) userMap.get("adminId");
 
-        Optional<User> returned;
-        returned = userRepository.findById(adminId);
+        Optional<User> idFound;
+        idFound = userRepository.findById(adminId);
 
-        if (!returned.isPresent())
-            return "ADMIN DOES NOT EXIST";
+        if (!idFound.isPresent())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
+                        Boolean.FALSE,"Admin Does Not Exist"
+                )
+        );
 
-        if (returned.get().getRole().compareTo("ADMIN") != 0)
-            return "UNAUTHORIZED ACCESS";
+        if (idFound.get().getRole().compareTo("ADMIN") != 0)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
+                            Boolean.FALSE,"Unauthorized Access"
+                    )
+            );
 
 
         String courseName = (String) userMap.get("courseName");
-        String courseCode = Validator_Subject.returnSubCode(courseName);
+        String courseCode = validatorSubject.returnSubCode(courseName);
 
         if (!(courseRepository.findById(courseCode).isPresent()))
-            return "COURSE NOT PRESENT";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
+                        Boolean.FALSE,"Course Does Not Exist"
+                )
+        );
 
-        List<UserCourseProgram> temp=userCourseRepository.findAll();
+        List<UserCourseProgram> tempCourse=userCourseRepository.findAll();
 
-        for(int index=0;index<temp.size();index++)
-            if(temp.get(index).getCourseName().compareTo(courseName)==0)
-                return "COURSE ALREAY ENROLLED";
+        for(int index=0 ; index<tempCourse.size() ; index++)
+            if(tempCourse.get(index).getCourseName().compareTo(courseName) == 0)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
+                        Boolean.FALSE,"Course enrolled by some student"
+                )
+        );
 
 
         courseRepository.deleteById(courseCode);
-        return "COURSE DELETED";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
+                        Boolean.TRUE,"Course Deleted"
+                )
+        );
 
     }
 
@@ -455,16 +475,16 @@ public class RestEndpoints {
 
         String adminId = (String) userMap.get("adminId");
 
-        Optional<User> returned;
-        returned = userRepository.findById(adminId);
+        Optional<User> idFound;
+        idFound = userRepository.findById(adminId);
 
-        if (!returned.isPresent())
+        if (!idFound.isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Insufficient Credit"
                     )
             );
 
-        if (returned.get().getRole().compareTo("ADMIN") != 0)
+        if (idFound.get().getRole().compareTo("ADMIN") != 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Unauthorized Access"
                     )
@@ -472,7 +492,7 @@ public class RestEndpoints {
 
 
         String subjectName = (String) userMap.get("subjectName");
-        String subjectCode = Validator_Subject.returnSubCode(subjectName);
+        String subjectCode = validatorSubject.returnSubCode(subjectName);
 
         if (!(subjectRepository.findById(subjectCode).isPresent()))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(

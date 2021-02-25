@@ -8,12 +8,12 @@ public class ApiResponse<T> implements Serializable
 
     T data;
 
-    Boolean successful;
+    Boolean status;
     String message;
 
-    public ApiResponse(T data, Boolean successful, String message) {
+    public ApiResponse(T data, Boolean status, String message) {
         this.data = data;
-        this.successful = successful;
+        this.status = status;
         this.message = message;
     }
 
@@ -26,12 +26,12 @@ public class ApiResponse<T> implements Serializable
         this.data = data;
     }
 
-    public Boolean getSuccessful() {
-        return successful;
+    public Boolean getStatus() {
+        return status;
     }
 
-    public void setSuccessful(Boolean successful) {
-        this.successful = successful;
+    public void setStatus(Boolean status) {
+        this.status = status;
     }
 
     public String getMessage() {
