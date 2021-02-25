@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 public class Validator {
 
-    static Boolean isName(String name)
+    static Boolean isValidName(String name)
     {
         Boolean val = name!=null;
 

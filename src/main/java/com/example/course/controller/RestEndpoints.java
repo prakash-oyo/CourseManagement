@@ -28,26 +28,27 @@ public class RestEndpoints {
     private UserCourseRepository userCourseRepository;
 
 
+
     @GetMapping("/user/{id}")
     public ResponseEntity <ApiResponse> searchUser(@PathVariable String id) {
 
-        Optional<User> idFound = userRepository.findById(id);
+        Optional<User> userFound = userRepository.findById(id);
 
-        if(!idFound.isPresent())
+        if(!userFound.isPresent())
         {
-            ApiResponse ret=new ApiResponse(idFound,Boolean.FALSE,"No Such User");
+            ApiResponse ret = new ApiResponse(userFound,Boolean.FALSE,"No Such User");
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ret);
         }
 
-            return ResponseEntity.ok(new ApiResponse(idFound.get(),Boolean.TRUE,"DONE"));
+        return ResponseEntity.ok(new ApiResponse(userFound.get(),Boolean.TRUE,"DONE"));
 
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/new/user")
-    public ResponseEntity<ApiResponse> registerUser(@RequestBody User noob) {
+    public ResponseEntity<ApiResponse> registerUser(@RequestBody User newUser) {
 
-        User toParse = new User(noob.getName(), noob.getEmail(), noob.getNumber(), noob.getRole());
+        User toParse = new User(newUser.getName(), newUser.getEmail(), newUser.getNumber(), newUser.getRole());
 
         if (toParse.getName().compareTo("invalid") == 0 ||
                 toParse.getEmail().compareTo("invalid") == 0 ||
@@ -80,12 +81,11 @@ public class RestEndpoints {
 
         Optional<User> idFound;
         idFound = userRepository.findById(id);
-
-
+        
         if (!idFound.isPresent()) {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
-                    Boolean.FALSE,"No Such USER"
+                            Boolean.FALSE,"No Such USER"
                     )
             );
         }
@@ -100,10 +100,7 @@ public class RestEndpoints {
 
 
         ObjectMapper mapper = new ObjectMapper();
-
         Subject tempSubject = mapper.convertValue(userMap, Subject.class);
-
-
         Subject toAddSubject = new Subject(tempSubject.getSubjectName(), tempSubject.getCredit());
 
         if (toAddSubject.getSubjectName().compareTo("invalid") == 0 ||
@@ -130,11 +127,11 @@ public class RestEndpoints {
 
 
 
-   @RequestMapping(method = RequestMethod.POST,value = "/new/course")
+    @RequestMapping(method = RequestMethod.POST,value = "/new/course")
     public ResponseEntity<StatusResponse> addCourse(@RequestBody Map<String, Object> userMap)
     {
 
-        String id=(String) userMap.get("id");
+        String id = (String) userMap.get("id");
         Optional<User> idFound;
 
         idFound = userRepository.findById(id);
@@ -147,14 +144,14 @@ public class RestEndpoints {
 
         if(idFound.get().getRole().compareTo("ADMIN")!=0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
-                            Boolean.FALSE,"Unauthorized Access"
+                    Boolean.FALSE,"Unauthorized Access"
             ));
 
         CourseProgram toAddCourse=new CourseProgram((String) userMap.get("CourseName"),
                 (int) userMap.get("maxCredit"));
 
-        if(toAddCourse.getCourseName().compareTo("invalid")==0||
-                toAddCourse.maxCredit==-1)
+        if(toAddCourse.getCourseName().compareTo("invalid") == 0||
+                toAddCourse.maxCredit == -1)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Invalid Course Details Entered"
                     )
@@ -179,9 +176,9 @@ public class RestEndpoints {
 
 
     @PostMapping("/addsubjecttocourse")
-    public ResponseEntity<StatusResponse> addSubjectToCourse(@RequestBody Map<String, Object> userMap) {
+    public ResponseEntity < StatusResponse> addSubjectToCourse(@RequestBody Map<String, Object> userMap) {
 
-        String id= (String) userMap.get("id");
+        String id = (String) userMap.get("id");
 
         Optional<User> idFound;
         idFound = userRepository.findById(id);
@@ -197,8 +194,8 @@ public class RestEndpoints {
                     )
             );
 
-        String subject=(String) userMap.get("subjectName");
-        String subjectCode= validatorSubject.returnSubCode(subject);
+        String subject = (String) userMap.get("subjectName");
+        String subjectCode = SubjectValidator.getSubjectCode(subject);
         Optional<Subject> subjectSelected;
         subjectSelected = subjectRepository.findById(subjectCode);
 
@@ -209,7 +206,7 @@ public class RestEndpoints {
             );
 
 
-        String courseCode = validatorSubject.returnSubCode((String) userMap.get("courseName"));
+        String courseCode = SubjectValidator.getSubjectCode((String) userMap.get("courseName"));
 
         if (!courseRepository.findById(courseCode).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
@@ -220,33 +217,33 @@ public class RestEndpoints {
         CourseProgram courseSelected = courseRepository.findById(courseCode).get();
 
 
-        List<Subject> sub=courseSelected.availableSubjects;
+        List<Subject> sub = courseSelected.availableSubjects;
 
-        for( int index=0 ; index<sub.size() ; index++)
-            if(sub.get(index).getSubjectCode().compareTo(subjectCode)==0)
-               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
+        for( int index = 0 ; index < sub.size() ; index++)
+            if(sub.get(index).getSubjectCode().compareTo(subjectCode) == 0)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                                 Boolean.FALSE,"Subject Already Added to "+courseSelected.getCourseName()
                         )
                 );
 
         courseSelected.getAvailableSubjects().add(subjectSelected.get());
 
-            courseRepository.save(courseSelected);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
-                            Boolean.TRUE,"Subject Added to "+courseSelected.getCourseName()
-                    )
-            );
+        courseRepository.save(courseSelected);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
+                        Boolean.TRUE,"Subject Added to "+courseSelected.getCourseName()
+                )
+        );
 
-        }
+    }
 
 
     @PostMapping("/enroll")
     public ResponseEntity<StatusResponse> enrollCourse(@RequestBody Map<String, Object> userMap) {
 
-        String id=(String) userMap.get("id");
+        String id = (String) userMap.get("id");
 
         Optional<User> idFound;
-        idFound=userRepository.findById(id);
+        idFound = userRepository.findById(id);
 
 
         if(!idFound.isPresent() || idFound.get().getRole().compareTo("STUDENT") != 0)
@@ -255,13 +252,13 @@ public class RestEndpoints {
                     )
             );
 
-        String courseCode= validatorSubject.returnSubCode((String) userMap.get("courseName"));
+        String courseCode = SubjectValidator.getSubjectCode((String) userMap.get("courseName"));
 
         if(!courseRepository.findById(courseCode).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
-        Boolean.FALSE,"Course Not Found"
-                        )
-                );
+                            Boolean.FALSE,"Course Not Found"
+                    )
+            );
 
         if(userCourseRepository.findById(id).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
@@ -281,7 +278,7 @@ public class RestEndpoints {
     @PostMapping("/student/add/subject")
     public ResponseEntity<StatusResponse> addSubjectByStudent(@RequestBody Map<String, Object> userMap) {
 
-        String id=(String) userMap.get("id");
+        String id = (String) userMap.get("id");
 
         Optional<User> idFound;
         idFound = userRepository.findById(id);
@@ -290,11 +287,11 @@ public class RestEndpoints {
 
         if(!idFound.isPresent() || idFound.get().getRole().compareTo("STUDENT") != 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
-                        Boolean.FALSE,"Invalid Id Or Authorization Error"
-                )
-        );
+                            Boolean.FALSE,"Invalid Id Or Authorization Error"
+                    )
+            );
 
-        String subjectCode= validatorSubject.returnSubCode((String) userMap.get("subjectName"));
+        String subjectCode = SubjectValidator.getSubjectCode((String) userMap.get("subjectName"));
 
         if(!subjectRepository.findById(subjectCode).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
@@ -315,46 +312,43 @@ public class RestEndpoints {
             );
 
 
-        String courseCode= validatorSubject.returnSubCode(courseSelected.get().getCourseName());
+        String courseCode = SubjectValidator.getSubjectCode(courseSelected.get().getCourseName());
         Optional<CourseProgram> course;
         course = courseRepository.findById(courseCode);
         CourseProgram currentCourse=course.get();
-        Boolean isPresent=false;
+        Boolean isSubjectPresent=false;
 
-        for(int sub = 0; sub< currentCourse.availableSubjects.size() &&!isPresent; sub++)
-            if(subjectCode.compareTo(currentCourse.availableSubjects.get(sub).getSubjectCode())==0)
-                isPresent=true;
+        for(int sub = 0; sub < currentCourse.availableSubjects.size() && !isSubjectPresent; sub++)
+            if(subjectCode.compareTo(currentCourse.availableSubjects.get(sub).getSubjectCode()) == 0)
+                isSubjectPresent = true;
 
-        if(!isPresent)
+        if(!isSubjectPresent)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Subject Not In "+currentCourse.getCourseName()
                     )
             );
 
-        UserCourseProgram userCourse=courseSelected.get();
+        UserCourseProgram userCourse = courseSelected.get();
 
-        int netCredit=0;
+        int netCredit = 0;
 
-        for(int sub=0 ; sub<userCourse.addedSubject.size();sub++) {
+
+        for(int sub=0 ; sub < userCourse.addedSubject.size(); sub++) {
             if (subjectCode.compareTo(userCourse.addedSubject.get(sub).getSubjectCode()) == 0)
-                isPresent = false;
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
+                                Boolean.FALSE,"Subject Already Added"
+                        )
+                );
 
-                netCredit += userCourse.addedSubject.get(sub).getCredit();
+            netCredit += userCourse.addedSubject.get(sub).getCredit();
 
         }
 
-
-        if(!isPresent)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
-                            Boolean.FALSE,"Subject Already Added"
-                    )
-            );
-
         if(netCredit + credit <= currentCourse.getMaxCredit() ) {
             courseSelected.get().getAddedSubject().add(new Subject((String) userMap.get("subjectName"), credit));
-            UserCourseProgram toAdd = courseSelected.get();
+            UserCourseProgram toAddCourse = courseSelected.get();
             userCourseRepository.deleteById(id);
-            userCourseRepository.save(toAdd);
+            userCourseRepository.save(toAddCourse);
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.TRUE,"Subject Successfully Added"
@@ -397,16 +391,16 @@ public class RestEndpoints {
 
 
         if(!idFound.isPresent())
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
-                    Boolean.FALSE,"Admin Does Not Exist"
-            )
-    );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
+                            Boolean.FALSE,"Admin Does Not Exist"
+                    )
+            );
 
         if(idFound.get().getRole().compareTo("ADMIN") != 0)
-          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
-                    Boolean.FALSE,"Unauthorized Access"
-            )
-    );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
+                            Boolean.FALSE,"Unauthorized Access"
+                    )
+            );
 
 
         if(userCourseRepository.findById(studentId).isPresent())
@@ -432,9 +426,9 @@ public class RestEndpoints {
 
         if (!idFound.isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
-                        Boolean.FALSE,"Admin Does Not Exist"
-                )
-        );
+                            Boolean.FALSE,"Admin Does Not Exist"
+                    )
+            );
 
         if (idFound.get().getRole().compareTo("ADMIN") != 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
@@ -444,22 +438,22 @@ public class RestEndpoints {
 
 
         String courseName = (String) userMap.get("courseName");
-        String courseCode = validatorSubject.returnSubCode(courseName);
+        String courseCode = SubjectValidator.getSubjectCode(courseName);
 
         if (!(courseRepository.findById(courseCode).isPresent()))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
-                        Boolean.FALSE,"Course Does Not Exist"
-                )
-        );
+                            Boolean.FALSE,"Course Does Not Exist"
+                    )
+            );
 
-        List<UserCourseProgram> tempCourse=userCourseRepository.findAll();
+        List<UserCourseProgram> userCourses = userCourseRepository.findAll();
 
-        for(int index=0 ; index<tempCourse.size() ; index++)
-            if(tempCourse.get(index).getCourseName().compareTo(courseName) == 0)
+        for(int index=0 ; index < userCourses.size() ; index++)
+            if(userCourses.get(index).getCourseName().compareTo(courseName) == 0)
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
-                        Boolean.FALSE,"Course enrolled by some student"
-                )
-        );
+                                Boolean.FALSE,"Course enrolled by some student"
+                        )
+                );
 
 
         courseRepository.deleteById(courseCode);
@@ -492,7 +486,7 @@ public class RestEndpoints {
 
 
         String subjectName = (String) userMap.get("subjectName");
-        String subjectCode = validatorSubject.returnSubCode(subjectName);
+        String subjectCode = SubjectValidator.getSubjectCode(subjectName);
 
         if (!(subjectRepository.findById(subjectCode).isPresent()))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
@@ -501,21 +495,14 @@ public class RestEndpoints {
             );
 
 
-
-        List<UserCourseProgram> temp=userCourseRepository.findAll();
-
+        List<UserCourseProgram> userCourses = userCourseRepository.findAll();
 
 
-
-        for(int index=0 ; index<temp.size() ; index++)
+        for(int index=0 ; index<userCourses.size() ; index++)
         {
-            System.out.println(temp.get(index).getCourseName());
-
-            List<Subject> subs = temp.get(index).getAddedSubject();
+            List<Subject> subs = userCourses.get(index).getAddedSubject();
 
             for(int rIndex=0 ; rIndex<subs.size();rIndex++) {
-
-                System.out.println(subs.get(rIndex).getSubjectName());
 
                 if (subs.get(rIndex).getSubjectName().compareTo(subjectName) == 0)
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
@@ -523,33 +510,29 @@ public class RestEndpoints {
                             )
                     );
 
-
-
             }
         }
 
 
-        List<CourseProgram> listOfCourse=courseRepository.findAll();
+        List<CourseProgram> listOfCourse = courseRepository.findAll();
 
 
 
-        for(int index=0; index<listOfCourse.size() ; index++ )
+        for(int index = 0; index<listOfCourse.size() ; index++ )
         {
-            List<Subject> cSub=listOfCourse.get(index).availableSubjects;
+            List<Subject> currentSubject = listOfCourse.get(index).getAvailableSubjects();
 
 
-            for(int rIndex=0; rIndex<cSub.size() ;rIndex++)
-                if(cSub.get(rIndex).getSubjectName().compareTo(subjectName)==0)
-                    cSub.remove(rIndex);
+            for(int rIndex = 0; rIndex < currentSubject.size() ; rIndex++)
+                if(currentSubject.get(rIndex).getSubjectName().compareTo(subjectName) == 0)
+                    currentSubject.remove(rIndex);
 
-            CourseProgram curr=listOfCourse.get(index);
+            CourseProgram currentCourse = listOfCourse.get(index);
 
             courseRepository.deleteById(listOfCourse.get(index).getCourseCode());
-            courseRepository.save(curr);
+            courseRepository.save(currentCourse);
 
         }
-
-
 
         subjectRepository.deleteById(subjectCode);
 
@@ -558,11 +541,6 @@ public class RestEndpoints {
                 )
         );
 
-
     }
-
-
-
-
 
 }

@@ -8,20 +8,20 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "Course_Program")
+@Table(name = "course_program")
 public class CourseProgram {
     @Id
     @NonNull
-    @Column(name="course_Code")
+    @Column(name = "course_code")
     String courseCode;
 
 
     @NonNull
-    @Column(name="course_Name")
+    @Column(name = "course_name")
     String courseName;
 
     @NonNull
-    @Column(name="max_Credit")
+    @Column(name = "max_credit")
     int maxCredit;
 
     @ManyToMany
@@ -30,24 +30,18 @@ public class CourseProgram {
     public CourseProgram(String courseName ,int maxCredit)
     {
 
-
-        Boolean isCourseName = validatorSubject.isCourseName(courseName);
-        if(isCourseName)
+        if(SubjectValidator.isCourseName(courseName))
             this.courseName = courseName;
         else this.courseName = "invalid";
 
-        if(maxCredit>0)
+        if(maxCredit > 0)
             this.maxCredit = maxCredit;
         else this.maxCredit = -1;
 
-        this.courseCode= validatorSubject.returnSubCode(courseName);
+        this.courseCode = SubjectValidator.getSubjectCode(courseName);
 
-        this.availableSubjects=null;
+        this.availableSubjects = null;
 
-
-    }
-
-    public CourseProgram() {
 
     }
 
@@ -75,7 +69,7 @@ public class CourseProgram {
         this.maxCredit = maxCredit;
     }
 
-    public List<Subject> getAvailableSubjects() {
+    public List<Subject > getAvailableSubjects() {
         return availableSubjects;
     }
 

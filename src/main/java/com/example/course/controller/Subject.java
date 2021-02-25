@@ -11,43 +11,36 @@ import javax.persistence.Table;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
-@Table(name = "Subject")
+@Table(name = "subject")
 public class Subject {
     @Id
     @NonNull
-    @Column(name="subject_Code")
+    @Column(name = "subject_code")
     String subjectCode;
 
     @NonNull
-    @Column(name="subject_Name")
+    @Column(name = "subject_name")
     String subjectName;
 
     @NonNull
-    @Column(name="credit")
+    @Column(name = "credit")
     int credit;
-
 
 
     public Subject(@NonNull String subjectName, int credit) {
 
-        Boolean isSubject = validatorSubject.isSubject(subjectName);
-
-        if(isSubject)
+        if(SubjectValidator.isValidSubject(subjectName))
             this.subjectName = subjectName;
 
-        if(credit>0)
+        if(credit > 0)
             this.credit = credit;
         else this.credit = -1;
 
-        this.subjectCode= validatorSubject.returnSubCode(subjectName);
-
-
+        this.subjectCode= SubjectValidator.getSubjectCode(subjectName);
 
     }
 
-    public Subject() {
 
-    }
 
     @NonNull
     public String getSubjectCode() {

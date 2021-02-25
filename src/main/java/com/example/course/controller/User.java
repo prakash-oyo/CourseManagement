@@ -26,42 +26,29 @@ public class User {
     String role;
 
 
-    @Override
-    public String toString()
-    {
-        return this.role;
-    }
-
 
     public User(String name,String email,String number,String role)
     {
-        Boolean isName = Validator.isName(name);
 
-        if(isName)
+        if(Validator.isValidName(name))
             this.name = name;
         else this.name = "invalid";
 
-        Boolean isEmail = Validator.isEmail(email);
-
-        if(isEmail)
+        if(Validator.isEmail(email))
             this.email = email;
         else this.email = "invalid";
 
-        Boolean isNumber=Validator.isNumber(number);
 
-        if(isNumber)
+        if(Validator.isNumber(number))
             this.number = number;
         else this.number = "invalid";
 
-
         role=role.toUpperCase();
 
-        if((role.compareTo("STUDENT")==0 || role.compareTo("ADMIN")==0))
+        if((role.compareTo("STUDENT") == 0 || role.compareTo("ADMIN") == 0))
             this.role = role;
         else this.role = "invalid";
 
-        System.out.println("There");
-        System.out.println(this.email);
 
     }
 

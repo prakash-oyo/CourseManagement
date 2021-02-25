@@ -1,30 +1,30 @@
 package com.example.course.controller;
 
 
-public class validatorSubject {
-    static Boolean isSubject(String subject)
+public class SubjectValidator {
+    static Boolean isValidSubject(String subject)
     {
-        Boolean val=subject!=null;
+        Boolean val =  subject.isEmpty();
 
-        for(int letter=0 ; letter<subject.length() && val ; letter++)
+        for(int letter=0 ; letter < subject.length() && val ; letter++)
             if(!( subject.charAt(letter) == ' ' || Character.isAlphabetic(subject.charAt(letter)) ))
-                val=false;
+                return false;
 
         return val;
 
     }
 
-    static Boolean isCredit(int credit)
+    static Boolean isValidCredit(int credit)
     {
         return Character.isDigit(credit);
     }
 
 
-    static String returnSubCode(String subjectName)
+    static String getSubjectCode(String subjectName)
     {
-        String ret="";
+        String ret = "";
 
-        int size=0,k=-1;
+        int size = 0,k = -1;
 
         int intArray[];
         intArray = new int[20];
@@ -37,17 +37,17 @@ public class validatorSubject {
 
             }else {
 
-                if(size>0)
-                    intArray[++k]=size;
+                if(size > 0)
+                    intArray[++k] = size;
 
-                size=0;
+                size = 0;
 
             }
 
-        int index=0;
+        int index = 0;
 
-        while(index<=k)
-            ret=ret+String.valueOf(intArray[index++]);
+        while(index <= k)
+            ret = ret + String.valueOf(intArray[index++]);
 
         return ret;
 
@@ -56,11 +56,11 @@ public class validatorSubject {
 
     static Boolean isCourseName(String courseName)
     {
-        Boolean val=courseName!=null;
+        Boolean val = courseName.isEmpty();
 
-        for(int letter=0 ; letter<courseName.length() && val ; letter++)
+        for(int letter = 0 ; letter < courseName.length() && val ; letter++)
             if(!( courseName.charAt(letter) == ' ' || Character.isAlphabetic(courseName.charAt(letter)) ))
-                val=false;
+                return false;
 
         return val;
     }
