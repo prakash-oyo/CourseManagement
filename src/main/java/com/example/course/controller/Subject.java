@@ -40,6 +40,11 @@ public class Subject {
 
     }
 
+    public Subject()
+    {
+
+    }
+
 
 
     @NonNull

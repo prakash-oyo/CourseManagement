@@ -6,18 +6,18 @@ public class Validator {
 
     static Boolean isValidName(String name)
     {
-        Boolean val = name!=null;
+        if(name.isEmpty())
+            return false;
 
-        for(int letter=0 ; letter<name.length() && val ; letter++)
+        for(int letter=0 ; letter<name.length() ; letter++)
             if(!( name.charAt(letter) == ' ' || Character.isAlphabetic(name.charAt(letter)) ))
-                val=false;
+                return false;
 
-            return val;
+            return true;
 
     }
 
-
-    static  Boolean isEmail(String email)
+    static  Boolean isValidEmail(String email)
     {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
                 "[a-zA-Z0-9_+&*-]+)*@" +
@@ -26,22 +26,20 @@ public class Validator {
 
         Pattern pat = Pattern.compile(emailRegex);
 
-        return (email != null&&pat.matcher(email).matches());
+        return (email != null && pat.matcher(email).matches());
 
     }
 
-    static  Boolean isNumber(String number)
+    static  Boolean isValidNumber(String number)
     {
-        Boolean val = true;
-
         if(number.length()!=10||number.charAt(0)<'6'||number.charAt(1)<'1')
-            val = false;
+            return false;
 
-        for(int num=2; num<number.length() && val; num++)
+        for(int num=2; num < number.length() ; num++)
             if(number.charAt(num)<'0' && number.charAt(num)>'9')
-                val = false;
+                return false;
 
-            return val;
+            return true;
     }
 
 

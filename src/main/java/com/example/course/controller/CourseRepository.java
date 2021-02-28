@@ -8,8 +8,6 @@ import java.util.List;
 
 @Repository
 public interface CourseRepository extends  JpaRepository<CourseProgram,String>{
-
     List<User> findByCourseName(String courseName);
-
 
 }

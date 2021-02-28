@@ -1,12 +1,16 @@
 package com.example.course.controller;
 
-
-import org.springframework.lang.NonNull;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 
+
+@NoArgsConstructor
+@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "course_program")
 public class CourseProgram {
@@ -14,7 +18,6 @@ public class CourseProgram {
     @NonNull
     @Column(name = "course_code")
     String courseCode;
-
 
     @NonNull
     @Column(name = "course_name")
@@ -29,7 +32,6 @@ public class CourseProgram {
 
     public CourseProgram(String courseName ,int maxCredit)
     {
-
         if(SubjectValidator.isCourseName(courseName))
             this.courseName = courseName;
         else this.courseName = "invalid";
@@ -41,39 +43,6 @@ public class CourseProgram {
         this.courseCode = SubjectValidator.getSubjectCode(courseName);
 
         this.availableSubjects = null;
-
-
     }
 
-    public String getCourseCode() {
-        return courseCode;
-    }
-
-    public void setCourseCode(String courseCode) {
-        this.courseCode = courseCode;
-    }
-
-    public String getCourseName() {
-        return courseName;
-    }
-
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
-    public int getMaxCredit() {
-        return maxCredit;
-    }
-
-    public void setMaxCredit(int maxCredit) {
-        this.maxCredit = maxCredit;
-    }
-
-    public List<Subject > getAvailableSubjects() {
-        return availableSubjects;
-    }
-
-    public void setAvailableSubjects(List<Subject> availableSubjects) {
-        this.availableSubjects = availableSubjects;
-    }
 }

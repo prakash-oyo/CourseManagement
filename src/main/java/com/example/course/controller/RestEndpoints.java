@@ -1,19 +1,17 @@
 package com.example.course.controller;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+
+
 @RestController
 public class RestEndpoints {
-
 
     @Autowired
     private UserRepository userRepository;
@@ -27,50 +25,47 @@ public class RestEndpoints {
     @Autowired
     private UserCourseRepository userCourseRepository;
 
-
-
     @GetMapping("/user/{id}")
     public ResponseEntity <ApiResponse> searchUser(@PathVariable String id) {
 
-        Optional<User> userFound = userRepository.findById(id);
+        Optional<User> user = userRepository.findById(id);
 
-        if(!userFound.isPresent())
+        if(!user.isPresent())
         {
-            ApiResponse ret = new ApiResponse(userFound,Boolean.FALSE,"No Such User");
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ret);
+            ApiResponse toReturn = new ApiResponse(user,Boolean.FALSE,"No Such User");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(toReturn);
         }
 
-        return ResponseEntity.ok(new ApiResponse(userFound.get(),Boolean.TRUE,"DONE"));
+        return ResponseEntity.ok(new ApiResponse(user.get(),Boolean.TRUE,"DONE"));
 
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/new/user")
-    public ResponseEntity<ApiResponse> registerUser(@RequestBody User newUser) {
+    public ResponseEntity<ApiResponse> registerUser(@RequestBody User body) {
 
-        User toParse = new User(newUser.getName(), newUser.getEmail(), newUser.getNumber(), newUser.getRole());
+        User newUser = new User(body.getName(), body.getEmail(), body.getNumber(), body.getRole());
 
-        if (toParse.getName().compareTo("invalid") == 0 ||
-                toParse.getEmail().compareTo("invalid") == 0 ||
-                toParse.getNumber().compareTo("invalid") == 0 ||
-                toParse.getRole().compareTo("invalid") == 0)
+        if (newUser.getName().compareTo("invalid") == 0 ||
+                newUser.getEmail().compareTo("invalid") == 0 ||
+                newUser.getNumber().compareTo("invalid") == 0 ||
+                newUser.getRole().compareTo("invalid") == 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Invalid Information Entered",Boolean.FALSE,"Try Again"));
 
 
-        if (toParse.getEmail().length() <= 0)
+        if (newUser.getEmail().length() <= 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(
                     "Invalid Email",Boolean.FALSE,"TRY AGAIN"
             ));
 
-        Optional<User> foundUser = userRepository.findById(toParse.getEmail());
+        Optional<User> user = userRepository.findById(newUser.getEmail());
 
-        if(foundUser.isPresent())
+        if(user.isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(
                     "User Already Exists",Boolean.FALSE,"Try Different Email"));
 
-        userRepository.save(toParse);
+        userRepository.save(newUser);
 
-        return ResponseEntity.ok(new ApiResponse(toParse,Boolean.TRUE,"USER CREATED!"));
+        return ResponseEntity.ok(new ApiResponse(newUser,Boolean.TRUE,"USER CREATED!"));
 
     }
 
@@ -78,10 +73,9 @@ public class RestEndpoints {
     public ResponseEntity<StatusResponse> addSubject(@RequestBody Map<String, Object> userMap) {
 
         String id = (String) userMap.get("id");
-
         Optional<User> idFound;
         idFound = userRepository.findById(id);
-        
+
         if (!idFound.isPresent()) {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
@@ -90,18 +84,13 @@ public class RestEndpoints {
             );
         }
 
-
-
         if (idFound.get().getRole().compareTo("ADMIN") != 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Authorization Error"
                     )
             );
 
-
-        ObjectMapper mapper = new ObjectMapper();
-        Subject tempSubject = mapper.convertValue(userMap, Subject.class);
-        Subject toAddSubject = new Subject(tempSubject.getSubjectName(), tempSubject.getCredit());
+        Subject toAddSubject = new Subject((String) userMap.get("subjectName"),(int) userMap.get("credit"));
 
         if (toAddSubject.getSubjectName().compareTo("invalid") == 0 ||
                 toAddSubject.getCredit() == -1)
@@ -125,12 +114,9 @@ public class RestEndpoints {
 
     }
 
-
-
-    @RequestMapping(method = RequestMethod.POST,value = "/new/course")
+    @PostMapping("/new/course")
     public ResponseEntity<StatusResponse> addCourse(@RequestBody Map<String, Object> userMap)
     {
-
         String id = (String) userMap.get("id");
         Optional<User> idFound;
 
@@ -141,29 +127,25 @@ public class RestEndpoints {
                     )
             );
 
-
-        if(idFound.get().getRole().compareTo("ADMIN")!=0)
+        if(idFound.get().getRole().compareTo("ADMIN") != 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                     Boolean.FALSE,"Unauthorized Access"
             ));
 
-        CourseProgram toAddCourse=new CourseProgram((String) userMap.get("CourseName"),
-                (int) userMap.get("maxCredit"));
+        CourseProgram toAddCourse=new CourseProgram((String) userMap.get("CourseName"),(int) userMap.get("maxCredit"));
 
         if(toAddCourse.getCourseName().compareTo("invalid") == 0||
-                toAddCourse.maxCredit == -1)
+                toAddCourse.getMaxCredit() == -1)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Invalid Course Details Entered"
                     )
             );
-
 
         if(courseRepository.findById(toAddCourse.getCourseCode()).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Course Already Exist"
                     )
             );
-
 
         courseRepository.save(toAddCourse);
 
@@ -173,7 +155,6 @@ public class RestEndpoints {
         );
 
     }
-
 
     @PostMapping("/addsubjecttocourse")
     public ResponseEntity < StatusResponse> addSubjectToCourse(@RequestBody Map<String, Object> userMap) {
@@ -216,7 +197,6 @@ public class RestEndpoints {
 
         CourseProgram courseSelected = courseRepository.findById(courseCode).get();
 
-
         List<Subject> sub = courseSelected.availableSubjects;
 
         for( int index = 0 ; index < sub.size() ; index++)
@@ -236,7 +216,6 @@ public class RestEndpoints {
 
     }
 
-
     @PostMapping("/enroll")
     public ResponseEntity<StatusResponse> enrollCourse(@RequestBody Map<String, Object> userMap) {
 
@@ -245,14 +224,14 @@ public class RestEndpoints {
         Optional<User> idFound;
         idFound = userRepository.findById(id);
 
-
         if(!idFound.isPresent() || idFound.get().getRole().compareTo("STUDENT") != 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Invalid Id Or Authorization Error"
                     )
             );
 
-        String courseCode = SubjectValidator.getSubjectCode((String) userMap.get("courseName"));
+        String courseName = (String) userMap.get("courseName");
+        String courseCode = SubjectValidator.getSubjectCode(courseName);
 
         if(!courseRepository.findById(courseCode).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
@@ -266,7 +245,7 @@ public class RestEndpoints {
                     )
             );
 
-        userCourseRepository.save(new UserCourseProgram(id,courseCode));
+        userCourseRepository.save(new UserCourseProgram(id,courseName));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                         Boolean.TRUE,"Enrolled to "+((String) userMap.get("courseName"))
@@ -283,8 +262,6 @@ public class RestEndpoints {
         Optional<User> idFound;
         idFound = userRepository.findById(id);
 
-
-
         if(!idFound.isPresent() || idFound.get().getRole().compareTo("STUDENT") != 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                             Boolean.FALSE,"Invalid Id Or Authorization Error"
@@ -299,7 +276,6 @@ public class RestEndpoints {
                     )
             );
 
-
         int credit = subjectRepository.findById(subjectCode).get().getCredit();
 
         Optional<UserCourseProgram> courseSelected;
@@ -310,7 +286,6 @@ public class RestEndpoints {
                             Boolean.FALSE,"Not Enrolled in any course"
                     )
             );
-
 
         String courseCode = SubjectValidator.getSubjectCode(courseSelected.get().getCourseName());
         Optional<CourseProgram> course;
@@ -329,9 +304,7 @@ public class RestEndpoints {
             );
 
         UserCourseProgram userCourse = courseSelected.get();
-
         int netCredit = 0;
-
 
         for(int sub=0 ; sub < userCourse.addedSubject.size(); sub++) {
             if (subjectCode.compareTo(userCourse.addedSubject.get(sub).getSubjectCode()) == 0)
@@ -364,12 +337,10 @@ public class RestEndpoints {
 
     }
 
-
     @DeleteMapping("del/student")
     public ResponseEntity<StatusResponse> deleteStudent(@RequestBody Map<String, Object> userMap)
     {
         String studentId=(String) userMap.get("studentId");
-
         Optional<User> idFound;
         idFound = userRepository.findById(studentId);
 
@@ -386,9 +357,7 @@ public class RestEndpoints {
             );
 
         String adminId=(String) userMap.get("adminId");
-
         idFound = userRepository.findById(adminId);
-
 
         if(!idFound.isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
@@ -402,17 +371,14 @@ public class RestEndpoints {
                     )
             );
 
-
         if(userCourseRepository.findById(studentId).isPresent())
             userCourseRepository.deleteById(studentId);
         userRepository.deleteById(studentId);
-
 
         return ResponseEntity.status(HttpStatus.OK).body(new StatusResponse(
                         Boolean.TRUE,"Student Deleted"
                 )
         );
-
 
     }
 
@@ -420,7 +386,6 @@ public class RestEndpoints {
     public ResponseEntity<StatusResponse> deleteCourse(@RequestBody Map<String, Object> userMap) {
 
         String adminId = (String) userMap.get("adminId");
-
         Optional<User> idFound;
         idFound = userRepository.findById(adminId);
 
@@ -435,7 +400,6 @@ public class RestEndpoints {
                             Boolean.FALSE,"Unauthorized Access"
                     )
             );
-
 
         String courseName = (String) userMap.get("courseName");
         String courseCode = SubjectValidator.getSubjectCode(courseName);
@@ -455,7 +419,6 @@ public class RestEndpoints {
                         )
                 );
 
-
         courseRepository.deleteById(courseCode);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                         Boolean.TRUE,"Course Deleted"
@@ -468,7 +431,6 @@ public class RestEndpoints {
     public ResponseEntity<StatusResponse> deleteSubject(@RequestBody Map<String, Object> userMap) {
 
         String adminId = (String) userMap.get("adminId");
-
         Optional<User> idFound;
         idFound = userRepository.findById(adminId);
 
@@ -484,7 +446,6 @@ public class RestEndpoints {
                     )
             );
 
-
         String subjectName = (String) userMap.get("subjectName");
         String subjectCode = SubjectValidator.getSubjectCode(subjectName);
 
@@ -494,41 +455,32 @@ public class RestEndpoints {
                     )
             );
 
-
         List<UserCourseProgram> userCourses = userCourseRepository.findAll();
 
-
-        for(int index=0 ; index<userCourses.size() ; index++)
+        for(int index=0 ; index < userCourses.size() ; index++)
         {
             List<Subject> subs = userCourses.get(index).getAddedSubject();
 
-            for(int rIndex=0 ; rIndex<subs.size();rIndex++) {
+            for(int rIndex=0 ; rIndex < subs.size() ; rIndex++) {
 
                 if (subs.get(rIndex).getSubjectName().compareTo(subjectName) == 0)
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StatusResponse(
                                     Boolean.FALSE,"Subject Enrolled By Some Student"
                             )
                     );
-
             }
         }
 
-
         List<CourseProgram> listOfCourse = courseRepository.findAll();
 
-
-
-        for(int index = 0; index<listOfCourse.size() ; index++ )
+        for(int index = 0; index < listOfCourse.size() ; index++ )
         {
             List<Subject> currentSubject = listOfCourse.get(index).getAvailableSubjects();
-
-
             for(int rIndex = 0; rIndex < currentSubject.size() ; rIndex++)
                 if(currentSubject.get(rIndex).getSubjectName().compareTo(subjectName) == 0)
                     currentSubject.remove(rIndex);
 
             CourseProgram currentCourse = listOfCourse.get(index);
-
             courseRepository.deleteById(listOfCourse.get(index).getCourseCode());
             courseRepository.save(currentCourse);
 
@@ -540,7 +492,5 @@ public class RestEndpoints {
                         Boolean.TRUE,"Subject Deleted"
                 )
         );
-
     }
-
 }

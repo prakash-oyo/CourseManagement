@@ -4,13 +4,14 @@ package com.example.course.controller;
 public class SubjectValidator {
     static Boolean isValidSubject(String subject)
     {
-        Boolean val =  subject.isEmpty();
+        if(subject.isEmpty())
+            return false;
 
-        for(int letter=0 ; letter < subject.length() && val ; letter++)
+        for(int letter=0 ; letter < subject.length(); letter++)
             if(!( subject.charAt(letter) == ' ' || Character.isAlphabetic(subject.charAt(letter)) ))
                 return false;
 
-        return val;
+        return true;
 
     }
 
@@ -22,32 +23,8 @@ public class SubjectValidator {
 
     static String getSubjectCode(String subjectName)
     {
-        String ret = "";
-
-        int size = 0,k = -1;
-
-        int intArray[];
-        intArray = new int[20];
-
-        for(int letter=0 ; letter<subjectName.length(); letter++)
-            if(subjectName.charAt(letter)!=' ') {
-
-                ret = ret + subjectName.charAt(letter);
-                size++;
-
-            }else {
-
-                if(size > 0)
-                    intArray[++k] = size;
-
-                size = 0;
-
-            }
-
-        int index = 0;
-
-        while(index <= k)
-            ret = ret + String.valueOf(intArray[index++]);
+        String ret = subjectName.replaceAll("\\s", ""); ;
+        ret = ret + String.valueOf(ret.length());
 
         return ret;
 
@@ -56,12 +33,13 @@ public class SubjectValidator {
 
     static Boolean isCourseName(String courseName)
     {
-        Boolean val = courseName.isEmpty();
+        if(courseName.isEmpty())
+            return false;
 
-        for(int letter = 0 ; letter < courseName.length() && val ; letter++)
-            if(!( courseName.charAt(letter) == ' ' || Character.isAlphabetic(courseName.charAt(letter)) ))
+        for(int character = 0 ; character < courseName.length() ; character++)
+            if(!( courseName.charAt(character) == ' ' || Character.isAlphabetic(courseName.charAt(character)) ))
                 return false;
 
-        return val;
+        return true;
     }
 }
