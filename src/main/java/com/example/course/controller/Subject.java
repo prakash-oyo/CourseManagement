@@ -1,14 +1,20 @@
 package com.example.course.controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.lang.NonNull;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 
+
+@NoArgsConstructor
+@Getter
+@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Table(name = "subject")
@@ -40,36 +46,4 @@ public class Subject {
 
     }
 
-    public Subject()
-    {
-
-    }
-
-
-
-    @NonNull
-    public String getSubjectCode() {
-        return subjectCode;
-    }
-
-    public void setSubjectCode(@NonNull String subjectCode) {
-        this.subjectCode = subjectCode;
-    }
-
-    @NonNull
-    public String getSubjectName() {
-        return subjectName;
-    }
-
-    public void setSubjectName(@NonNull String subjectName) {
-        this.subjectName = subjectName;
-    }
-
-    public int getCredit() {
-        return credit;
-    }
-
-    public void setCredit(int credit) {
-        this.credit = credit;
-    }
 }

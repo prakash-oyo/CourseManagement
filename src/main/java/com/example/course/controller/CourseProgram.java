@@ -43,6 +43,7 @@ public class CourseProgram {
         this.courseCode = SubjectValidator.getSubjectCode(courseName);
 
         this.availableSubjects = null;
+
     }
 
 }

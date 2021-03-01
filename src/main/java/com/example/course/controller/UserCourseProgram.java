@@ -26,7 +26,7 @@ public class UserCourseProgram {
     String courseName;
 
     @ManyToMany
-    List<Subject> addedSubject;
+    List<Subject> enrollSubjects;
 
     public UserCourseProgram(@NonNull String email, @NonNull String courseName) {
 
@@ -42,7 +42,7 @@ public class UserCourseProgram {
             this.courseName = courseName;
         else this.courseName = "invalid";
 
-        this.addedSubject = null;
+        this.enrollSubjects = null;
 
     }
 
