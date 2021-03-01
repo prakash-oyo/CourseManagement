@@ -23,10 +23,10 @@ public class SubjectValidator {
 
     static String getSubjectCode(String subjectName)
     {
-        String ret = subjectName.replaceAll("\\s", ""); ;
-        ret = ret + String.valueOf(ret.length());
+        String subjectCode = subjectName.replaceAll("\\s", ""); ;
+        subjectCode = subjectCode + String.valueOf(ret.length());
 
-        return ret;
+        return subjectCode;
 
     }
 
