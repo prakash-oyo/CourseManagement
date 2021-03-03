@@ -24,7 +24,7 @@ public class SubjectValidator {
     static String getSubjectCode(String subjectName)
     {
         String subjectCode = subjectName.replaceAll("\\s", ""); ;
-        subjectCode = subjectCode + String.valueOf(ret.length());
+        subjectCode = subjectCode + String.valueOf(subjectCode.length());
 
         return subjectCode;
 

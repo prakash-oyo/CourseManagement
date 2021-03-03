@@ -33,7 +33,7 @@ public class RestEndpoints {
         if(!user.isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(user,Boolean.FALSE,"No Such User"));
 
-        return ResponseEntity.ok(new ApiResponse(user.get(),Boolean.TRUE,"DONE"));
+        return ResponseEntity.ok(new ApiResponse(user.get(),Boolean.TRUE,"Successful"));
 
     }
 
