@@ -38,7 +38,7 @@ public class Requests {
 
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/new/user")
+    @PostMapping( "/new/user")
     public ResponseEntity<ApiResponse> registerUser(@RequestBody User body) {
 
         if (Validator.isValidName(body.getName()) && Validator.isValidEmail(body.getEmail()) && Validator.isValidNumber(body.getNumber()) && Validator.isValidRole(body.getRole()))
