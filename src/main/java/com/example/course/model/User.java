@@ -1,4 +1,4 @@
-package com.example.course.controller;
+package com.example.course.model;
 
 
 import lombok.Getter;
@@ -49,7 +49,7 @@ public class User {
             this.number = number;
         else this.number = "invalid";
 
-        role=role.toUpperCase();
+        role = role.toUpperCase();
 
         if((role.compareTo("STUDENT") == 0 || role.compareTo("ADMIN") == 0))
             this.role = role;

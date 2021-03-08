@@ -1,10 +1,10 @@
-package com.example.course.controller;
+package com.example.course.model;
 
 import java.util.regex.Pattern;
 
 public class Validator {
 
-    static Boolean isValidName(String name)
+    public static Boolean isValidName(String name)
     {
         if(name.isEmpty())
             return false;
@@ -17,8 +17,12 @@ public class Validator {
 
     }
 
-    static  Boolean isValidEmail(String email)
+    public static  Boolean isValidEmail(String email)
     {
+
+        if(email.length() <= 0)
+            return false;
+
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
                 "[a-zA-Z0-9_+&*-]+)*@" +
                 "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
@@ -30,7 +34,7 @@ public class Validator {
 
     }
 
-    static  Boolean isValidNumber(String number)
+    public static  Boolean isValidNumber(String number)
     {
         if(number.length()!=10||number.charAt(0)<'6'||number.charAt(1)<'1')
             return false;
@@ -42,7 +46,13 @@ public class Validator {
             return true;
     }
 
+    public static Boolean isValidRole(String role)
+    {
+        if(role.compareTo("ADMIN")==0||role.compareTo("STUDENT")==0)
+            return true;
 
+        return false;
 
+    }
 
 }

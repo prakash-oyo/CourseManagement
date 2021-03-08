@@ -1,4 +1,4 @@
-package com.example.course.controller;
+package com.example.course.model;
 
 import lombok.*;
 
@@ -8,7 +8,6 @@ import java.util.List;
 
 
 @NoArgsConstructor
-@Data
 @Getter
 @Setter
 @Entity
@@ -17,18 +16,18 @@ public class CourseProgram {
     @Id
     @NonNull
     @Column(name = "course_code")
-    String courseCode;
+    public String courseCode;
 
     @NonNull
     @Column(name = "course_name")
-    String courseName;
+    public String courseName;
 
     @NonNull
     @Column(name = "max_credit")
-    int maxCredit;
+    public int maxCredit;
 
     @ManyToMany
-    List<Subject> availableSubjects;
+    public List<Subject> availableSubjects;
 
     public CourseProgram(String courseName ,int maxCredit)
     {

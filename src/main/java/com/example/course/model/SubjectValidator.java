@@ -1,8 +1,8 @@
-package com.example.course.controller;
+package com.example.course.model;
 
 
 public class SubjectValidator {
-    static Boolean isValidSubject(String subject)
+    public static Boolean isValidSubject(String subject)
     {
         if(subject.isEmpty())
             return false;
@@ -15,13 +15,12 @@ public class SubjectValidator {
 
     }
 
-    static Boolean isValidCredit(int credit)
+    public static Boolean isValidCredit(int credit)
     {
         return Character.isDigit(credit);
     }
 
-
-    static String getSubjectCode(String subjectName)
+    public static String getSubjectCode(String subjectName)
     {
         String subjectCode = subjectName.replaceAll("\\s", ""); ;
         subjectCode = subjectCode + String.valueOf(subjectCode.length());
@@ -31,7 +30,7 @@ public class SubjectValidator {
     }
 
 
-    static Boolean isCourseName(String courseName)
+    public static Boolean isCourseName(String courseName)
     {
         if(courseName.isEmpty())
             return false;
